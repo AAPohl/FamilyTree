@@ -7,18 +7,48 @@ namespace FamilyTree
 {
 	public static class ArcCreator
 	{
-		public static SvgElement CreateArc(PointF centre, float radius, float startAngle, float endAngle, Color color)
+		public static SvgElement CreateArcText(PointF centre, float radius, float startAngle, float endAngle, string text, Color color, float fontSize)
 		{
-			PointF p1 = new PointF
+			var path = createArcPath(centre, radius, startAngle, endAngle);
+			var arcLength = 2.0f * MathF.PI * radius * (endAngle - startAngle) / (360.0f)  / 2.0f;
+			var svgText = new SvgText()
 			{
-				X = centre.X + radius * MathF.Sin(startAngle * MathF.PI / 180.0f),
-				Y = centre.Y - radius * MathF.Cos(startAngle * MathF.PI / 180.0f)
+				FontSize = fontSize,
+				TextAnchor = SvgTextAnchor.Middle,
+				Dy = new SvgUnitCollection() { fontSize / 3},
+				X = new SvgUnitCollection() { arcLength},
+				Fill = new SvgColourServer(color)
 			};
-			PointF p2 = new PointF
+
+			var guid = Guid.NewGuid().ToString();
+			Uri.TryCreate($"#{guid}", UriKind.Relative, out var uri);
+			var textPath = new SvgTextPath()
 			{
-				X = centre.X + radius * MathF.Sin(endAngle * MathF.PI / 180.0f),
-				Y = centre.Y - radius * MathF.Cos(endAngle * MathF.PI / 180.0f)
+				Text = text,
+				ReferencedPath = uri
+
 			};
+			path.ID = guid;
+			svgText.Children.Add(path);
+			svgText.Children.Add(textPath);
+
+			return svgText;
+		}
+
+		public static SvgElement CreateArcBorder(PointF centre, float radius, float startAngle, float endAngle, Color color)
+		{
+			var path = createArcPath(centre, radius, startAngle, endAngle);
+			path.Stroke = new SvgColourServer(color);
+			path.StrokeWidth = Constants.StrokeWidth;
+			path.Fill = new SvgColourServer(Color.Empty);
+
+			return path;
+		}
+
+		private static SvgPath createArcPath(PointF centre, float radius, float startAngle, float endAngle)
+		{
+			PointF p1 = MathHelper.CreatePoint(centre, radius, startAngle);
+			PointF p2 = MathHelper.CreatePoint(centre, radius, endAngle);
 
 			var totalAngle = endAngle - startAngle;
 			SvgPathSegmentList ls = new SvgPathSegmentList();
@@ -27,10 +57,7 @@ namespace FamilyTree
 
 			var path = new SvgPath
 			{
-				Stroke = new SvgColourServer(color),
 				PathData = ls,
-				StrokeWidth = Constants.StrokeWidth,
-				Fill = new SvgColourServer(Color.Empty)
 			};
 
 			return path;

@@ -1,6 +1,4 @@
 ﻿using Svg;
-using Svg.Pathing;
-using System;
 using System.Drawing;
 
 namespace FamilyTree
@@ -9,16 +7,8 @@ namespace FamilyTree
 	{
 		public static SvgElement CreateLine(PointF centre, float startRadius, float endRadius, float angle, Color color)
 		{
-			PointF p1 = new PointF
-			{
-				X = centre.X + startRadius * MathF.Sin(angle * MathF.PI / 180.0f),
-				Y = centre.Y - startRadius * MathF.Cos(angle * MathF.PI / 180.0f)
-			};
-			PointF p2 = new PointF
-			{
-				X = centre.X + endRadius * MathF.Sin(angle * MathF.PI / 180.0f),
-				Y = centre.Y - endRadius * MathF.Cos(angle * MathF.PI / 180.0f)
-			};
+			PointF p1 = MathHelper.CreatePoint(centre, startRadius, angle);
+			PointF p2 = MathHelper.CreatePoint(centre, endRadius, angle);
 
 			var line = new SvgLine();
 			line.StartX = p1.X;

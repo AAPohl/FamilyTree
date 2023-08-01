@@ -3,3 +3,6 @@
 ################################################################################
 
 /.vs
+/FamilyTree/.vs/FamilyTree/v16/.suo
+/FamilyTree/obj
+/FamilyTree/bin/Debug/net5.0

@@ -7,6 +7,18 @@ namespace FamilyTree
 {
 	public static class ArcCreator
 	{
+		public static SvgElement CreateCircle(PointF centre, float radius, Color color)
+		{
+			var circle = new SvgCircle();
+			circle.CenterX = centre.X;
+			circle.CenterY = centre.Y;
+			circle.Radius = radius;
+			circle.Stroke = new SvgColourServer(color);
+			circle.StrokeWidth = Constants.StrokeWidth;
+			circle.Fill = new SvgColourServer(Color.Empty);
+
+			return circle;
+		}
 		public static SvgElement CreateArcText(PointF centre, float radius, float startAngle, float endAngle, string text, Color color, float fontSize)
 		{
 			var path = createArcPath(centre, radius, startAngle, endAngle);

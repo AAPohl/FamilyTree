@@ -20,7 +20,7 @@ namespace FamilyTree
 			var radius = 1.0f * Constants.ScalingFactor;
 			yield return radius;
 
-			for (int i = 1; i < numberOfGenerations + 1; ++i)
+			for (int i = 1; i < numberOfGenerations; ++i)
 			{
 				radius = radius + (i > 2 ? 2.0f : 1.0f) * Constants.ScalingFactor;
 				yield return radius;
@@ -29,7 +29,7 @@ namespace FamilyTree
 
 		public static IEnumerable<float> GetCreateAngles(int numberOfGenerations)
 		{
-			var numberOfAngles = (int)Math.Pow(2, numberOfGenerations) + 1;
+			var numberOfAngles = (int)Math.Pow(2, numberOfGenerations - 1) + 1;
 			var deltaAngle = Constants.OuterAngle * 2.0f / (numberOfAngles - 1);
 			for(int i = 0; i < numberOfAngles; ++i)
 			{

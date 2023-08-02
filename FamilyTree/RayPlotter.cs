@@ -9,7 +9,7 @@ namespace FamilyTree
 		public static void PlotRays(SvgDocument document, PointF centre, int numberOfGenerations)
 		{
 			var radii = MathHelper.GetCreateRadii(numberOfGenerations).ToArray();
-			for (int j = 1; j < numberOfGenerations + 1; ++j)
+			for (int j = 1; j < numberOfGenerations; ++j)
 			{ 
 				var angles = MathHelper.GetCreateAngles(j).ToArray();
 				for (int i = 0; i < angles.Length; ++i)

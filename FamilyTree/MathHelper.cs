@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace FamilyTree
 {
@@ -27,6 +28,20 @@ namespace FamilyTree
 			}
 		}
 
+		internal static IEnumerable<Person> GetPersonsOfLevel(Person person, int level)
+		{
+			if (level == 1)
+				yield return person;
+			else
+			{
+				foreach (var p in GetPersonsOfLevel(person.Father, level - 1))
+					yield return p;
+
+				foreach (var p in GetPersonsOfLevel(person.Mother, level - 1))
+					yield return p;
+			}
+		}
+
 		public static IEnumerable<float> GetCreateAngles(int numberOfGenerations)
 		{
 			var numberOfAngles = (int)Math.Pow(2, numberOfGenerations - 1) + 1;
@@ -35,7 +50,15 @@ namespace FamilyTree
 			{
 				yield return -Constants.OuterAngle + i * deltaAngle;
 			}
+		}
 
+		public static IEnumerable<(T start, T end)> Intersect<T>(IEnumerable<T> values)
+		{
+			var x = values.ToArray();
+			for(int i = 1; i < x.Count(); ++i)
+			{
+				yield return (x[i - 1], x[i]);
+			}
 		}
 	}
 }

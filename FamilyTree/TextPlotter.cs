@@ -1,5 +1,7 @@
 ﻿using Svg;
+using System;
 using System.Drawing;
+using System.Linq;
 
 namespace FamilyTree
 {
@@ -7,40 +9,50 @@ namespace FamilyTree
 	{
 		public static void PlotText(SvgDocument document, PointF centre, Person model, int numberOfGenerations)
 		{
+			var radii = MathHelper.GetCreateRadii(numberOfGenerations).ToArray();
+
 			// Main Person
 			plotMainPerson(document, centre, model);
 
 			// Generation 1
-			plotInnerPerson(document, centre, 75, -Constants.OuterAngle, 0, model.Father);
-			plotInnerPerson(document, centre, 75, 0, Constants.OuterAngle, model.Mother);
+			var angleSets_1 = MathHelper.Intersect(MathHelper.GetCreateAngles(2)).ToArray();
+			var personSet_1 = MathHelper.GetPersonsOfLevel(model, 2).ToArray();
+			plotInnerPersons(document, centre, (radii[1] + radii[0]) / 2.0f, angleSets_1, personSet_1);
 
 			// Generation 2
-			plotInnerPerson(document, centre, 125, -Constants.OuterAngle, -Constants.OuterAngle / 2.0f, model.Father.Father);
-			plotInnerPerson(document, centre, 125, -Constants.OuterAngle / 2.0f, 0, model.Father.Mother);
-			plotInnerPerson(document, centre, 125, 0, Constants.OuterAngle / 2.0f, model.Mother.Father);
-			plotInnerPerson(document, centre, 125, Constants.OuterAngle /2.0f, Constants.OuterAngle, model.Mother.Mother);
+			var angleSets_2 = MathHelper.Intersect(MathHelper.GetCreateAngles(3)).ToArray();
+			var personSet_2 = MathHelper.GetPersonsOfLevel(model, 3).ToArray();
+			plotInnerPersons(document, centre, (radii[2] + radii[1]) / 2.0f, angleSets_2, personSet_2);
+
 		}
 
-		private static void plotInnerPerson(SvgDocument document, PointF centre, float radius, float innerAngle, float outerAngle, Person person)
+		private static void plotInnerPersons(SvgDocument document, PointF centre, float radius, (float start, float end)[] angleSets, Person[] personSet)
+		{
+			for(int i = 0; i <angleSets.Length; ++i)			
+				plotInnerPerson(document, centre, radius, angleSets[i], personSet[i]);
+			
+		}
+
+		private static void plotInnerPerson(SvgDocument document, PointF centre, float radius, (float innerAngle, float outerAngle) angle, Person person)
 		{
 			document.Children.Add(ArcCreator.CreateArcText(	centre, 
 															radius + Constants.MainFontSize,
-															innerAngle,
-															outerAngle, 
+															angle.innerAngle,
+															angle.outerAngle, 
 															person.Name, 
 															Color.Black, 
 															Constants.MainFontSize));
 			document.Children.Add(ArcCreator.CreateArcText(	centre, 
 															radius,
-															innerAngle,
-															outerAngle, 
+															angle.innerAngle,
+															angle.outerAngle, 
 															person.FamilyName, 
 															Color.Black, 
 															Constants.MainFontSize));
 			document.Children.Add(ArcCreator.CreateArcText(	centre, 
 															radius - Constants.MainFontSize,
-															innerAngle,
-															outerAngle, 
+															angle.innerAngle,
+															angle.outerAngle, 
 															createYearText(person), 
 															Color.FromArgb(255, 139, 139, 142), 
 															Constants.MainFontSize));

@@ -29,44 +29,76 @@ namespace FamilyTree
 			{
 				var angleSet_N = MathHelper.GetCreateAngles(i+1).Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
 				var personSet_N = MathHelper.GetPersonsOfLevel(model, i+1).ToArray();
-				plotOuterPersons(document, centre, radii[i-1], angleSet_N, personSet_N);
+				plotOuterPersons(document, centre, radii[i-1], angleSet_N, personSet_N, i);
 			}
 		}
 
-		private static void plotOuterPersons(SvgDocument document, PointF centre, float radius, float[] angleSets, Person[] personSet)
+		private static void plotOuterPersons(SvgDocument document, PointF centre, float radius, float[] angleSets, Person[] personSet, int currentGeneration)
 		{
 			for (int i = 0; i < angleSets.Length; ++i)
-				plotOuterPerson(document, centre, radius, angleSets[i], personSet[i]);
+				plotOuterPerson(document, centre, radius, angleSets[i], personSet[i], currentGeneration);
 
 		}
 
-		private static void plotOuterPerson(SvgDocument document, PointF centre, float radius, float angle, Person person)
+		private static void plotOuterPerson(SvgDocument document, PointF centre, float radius, float angle, Person person, int currentGeneration)
 		{
 			// x / ( 2 * pi * r) = deltaAngle / 360
 			var deltaAngle = Constants.MainFontSize / (2.0f * MathF.PI * radius) * 360.0f;
 			if (angle < 0)
 				deltaAngle = -deltaAngle;
-			document.Children.Add(RotatedLineCreator.CreateRotatedText(
-															centre,
-															radius,
-															angle - deltaAngle,
-															person.Name,
-															Color.Black,
-															Constants.MainFontSize));
-			document.Children.Add(RotatedLineCreator.CreateRotatedText(
-															centre, 
-															radius, 
-															angle, 
-															person.FamilyName,
-															Color.Black, 
-															Constants.MainFontSize));
-			document.Children.Add(RotatedLineCreator.CreateRotatedText(
-															centre,
-															radius,
-															angle + deltaAngle,
-															createYearText(person),
-															Color.FromArgb(255, 139, 139, 142),
-															Constants.MainFontSize));
+
+			if (currentGeneration < 6)
+			{
+				document.Children.Add(RotatedLineCreator.CreateRotatedText(
+																centre,
+																radius,
+																angle - deltaAngle,
+																person.Name,
+																Color.Black,
+																Constants.MainFontSize));
+				document.Children.Add(RotatedLineCreator.CreateRotatedText(
+																centre,
+																radius,
+																angle,
+																person.FamilyName,
+																Color.Black,
+																Constants.MainFontSize));
+				document.Children.Add(RotatedLineCreator.CreateRotatedText(
+																centre,
+																radius,
+																angle + deltaAngle,
+																createYearText(person),
+																Color.FromArgb(255, 139, 139, 142),
+																Constants.MainFontSize));
+			}
+			else if (currentGeneration < 7)
+			{
+				document.Children.Add(RotatedLineCreator.CreateRotatedText(
+																centre,
+																radius,
+																angle - deltaAngle /2.0f,
+																person.Name,
+																Color.Black,
+																Constants.MainFontSize));
+				document.Children.Add(RotatedLineCreator.CreateRotatedText(
+																centre,
+																radius,
+																angle + deltaAngle / 2.0f,
+																person.FamilyName,
+																Color.Black,
+																Constants.MainFontSize));
+			}
+			else
+			{
+				var name = $"{person.Name.Remove(1,person.Name.Length - 1)}.{person.FamilyName}";
+				document.Children.Add(RotatedLineCreator.CreateRotatedText(
+																centre,
+																radius,
+																angle,
+																name,
+																Color.Black,
+																Constants.MainFontSize));
+			}
 		}
 
 		private static void plotInnerPersons(SvgDocument document, PointF centre, float radius, (float start, float end)[] angleSets, Person[] personSet)

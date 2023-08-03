@@ -20,7 +20,7 @@ namespace FamilyTree
 				Fill = new SvgColourServer(color),
 				Text = text,
 				Font = Constants.Font,
-				Transforms = new SvgTransformCollection() {new SvgTranslate(textCentre.X, textCentre.Y), new SvgRotate(adjustAngle(angle)) }
+				Transforms = new SvgTransformCollection() {new SvgTranslate(textCentre.X, textCentre.Y), new SvgRotate(adjustAngle(angle)), new SvgTranslate(0 ,Constants.MainFontSize / 4.0f) }
 			};
 
 			return svgText;

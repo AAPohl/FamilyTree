@@ -24,10 +24,13 @@ namespace FamilyTree
 			var personSet_2 = MathHelper.GetPersonsOfLevel(model, 3).ToArray();
 			plotInnerPersons(document, centre, radii[1], angleSets_2, personSet_2);
 
-			// Generation 3
-			var angleSet_3 = MathHelper.GetCreateAngles(4).Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
-			var personSet_3 = MathHelper.GetPersonsOfLevel(model, 4).ToArray();
-			plotOuterPersons(document, centre, radii[2], angleSet_3, personSet_3);
+			// Generation 3 .. n
+			for (int i = 3; i < numberOfGenerations; ++i)
+			{
+				var angleSet_N = MathHelper.GetCreateAngles(i+1).Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
+				var personSet_N = MathHelper.GetPersonsOfLevel(model, i+1).ToArray();
+				plotOuterPersons(document, centre, radii[i-1], angleSet_N, personSet_N);
+			}
 		}
 
 		private static void plotOuterPersons(SvgDocument document, PointF centre, float radius, float[] angleSets, Person[] personSet)
@@ -41,26 +44,28 @@ namespace FamilyTree
 		{
 			// x / ( 2 * pi * r) = deltaAngle / 360
 			var deltaAngle = Constants.MainFontSize / (2.0f * MathF.PI * radius) * 360.0f;
+			if (angle < 0)
+				deltaAngle = -deltaAngle;
 			document.Children.Add(RotatedLineCreator.CreateRotatedText(
 															centre,
 															radius,
 															angle - deltaAngle,
 															person.Name,
-															Color.Red,
+															Color.Black,
 															Constants.MainFontSize));
 			document.Children.Add(RotatedLineCreator.CreateRotatedText(
 															centre, 
 															radius, 
 															angle, 
-															person.FamilyName, 
-															Color.Red, 
+															person.FamilyName,
+															Color.Black, 
 															Constants.MainFontSize));
 			document.Children.Add(RotatedLineCreator.CreateRotatedText(
 															centre,
 															radius,
 															angle + deltaAngle,
 															createYearText(person),
-															Color.Red,
+															Color.FromArgb(255, 139, 139, 142),
 															Constants.MainFontSize));
 		}
 

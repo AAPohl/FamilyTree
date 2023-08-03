@@ -23,7 +23,14 @@ namespace FamilyTree
 
 			for (int i = 1; i < numberOfGenerations; ++i)
 			{
-				radius = radius + (i > 2 ? 2.0f : 1.0f) * Constants.ScalingFactor;
+				if(i < 3)
+					radius = radius + 1.0f * Constants.ScalingFactor;
+				else if (i < 9)
+					radius = radius + 2.0f * Constants.ScalingFactor;
+				else if (i == 9)
+					radius = radius + 1.5f * Constants.ScalingFactor;
+				else
+					radius = radius + 0.75f * Constants.ScalingFactor;
 				yield return radius;
 			}
 		}

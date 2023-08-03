@@ -20,13 +20,13 @@ namespace FamilyTree
 				Fill = new SvgColourServer(color),
 				Text = text,
 				Font = Constants.Font,
-				Transforms = new SvgTransformCollection() {new SvgTranslate(textCentre.X, textCentre.Y), new SvgRotate(adjustAngle(angle)), new SvgTranslate(0 ,Constants.MainFontSize / 4.0f) }
+				Transforms = new SvgTransformCollection() {new SvgTranslate(textCentre.X, textCentre.Y), new SvgRotate(adjustAngle(angle)), new SvgTranslate(0 ,fontSize / 4.0f) }
 			};
 
 			return svgText;
 		}
 
-		public static SvgElement CreateRotatedLine(PointF centre, float startRadius, float endRadius, float angle, Color color)
+		public static SvgElement CreateRotatedLine(PointF centre, float startRadius, float endRadius, float angle, Color color, float lineWidth)
 		{
 			PointF p1 = MathHelper.CreatePoint(centre, startRadius, angle);
 			PointF p2 = MathHelper.CreatePoint(centre, endRadius, angle);
@@ -37,7 +37,7 @@ namespace FamilyTree
 			line.EndX = p2.X;
 			line.EndY = p2.Y;
 			line.Stroke = new SvgColourServer(color);
-			line.StrokeWidth = Constants.StrokeWidth;
+			line.StrokeWidth = lineWidth;
 
 			return line;
 		}		

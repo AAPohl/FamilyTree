@@ -7,14 +7,14 @@ namespace FamilyTree
 {
 	public static class ArcCreator
 	{
-		public static SvgElement CreateCircle(PointF centre, float radius, Color color)
+		public static SvgElement CreateCircle(PointF centre, float radius, Color color, float lineWidth)
 		{
 			var circle = new SvgCircle();
 			circle.CenterX = centre.X;
 			circle.CenterY = centre.Y;
 			circle.Radius = radius;
 			circle.Stroke = new SvgColourServer(color);
-			circle.StrokeWidth = Constants.StrokeWidth;
+			circle.StrokeWidth = lineWidth;
 			circle.Fill = new SvgColourServer(Color.Empty);
 
 			return circle;
@@ -48,11 +48,11 @@ namespace FamilyTree
 			return svgText;
 		}
 
-		public static SvgElement CreateArcBorder(PointF centre, float radius, float startAngle, float endAngle, Color color)
+		public static SvgElement CreateArcBorder(PointF centre, float radius, float startAngle, float endAngle, Color color, float lineWidth)
 		{
 			var path = createArcPath(centre, radius, startAngle, endAngle);
 			path.Stroke = new SvgColourServer(color);
-			path.StrokeWidth = Constants.StrokeWidth;
+			path.StrokeWidth = lineWidth;
 			path.Fill = new SvgColourServer(Color.Empty);
 
 			return path;

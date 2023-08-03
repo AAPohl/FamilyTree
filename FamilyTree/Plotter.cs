@@ -18,7 +18,7 @@ namespace FamilyTree
 			var centre = new PointF(outerRadius, outerRadius);
 
 			RayPlotter.PlotRays(document, centre, numberOfGenerations);
-			CirclePlotter.PlotCircles(document, centre, numberOfGenerations);
+			CirclePlotter.PlotCircles(document, centre, numberOfGenerations, 3.0f);
 			TextPlotter.PlotText(document, centre, model, numberOfGenerations);
 
 			return document;

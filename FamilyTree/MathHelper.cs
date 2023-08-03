@@ -52,12 +52,21 @@ namespace FamilyTree
 			}
 		}
 
-		public static IEnumerable<(T start, T end)> Intersect<T>(IEnumerable<T> values)
+		public static IEnumerable<(T start, T end)> Intersect<T>(this IEnumerable<T> values)
 		{
 			var x = values.ToArray();
 			for(int i = 1; i < x.Count(); ++i)
 			{
 				yield return (x[i - 1], x[i]);
+			}
+		}
+
+		public static IEnumerable<T> Compute<T>(this IEnumerable<(T start, T end)> values, Func<(T start, T end), T> operation)
+		{
+			var x = values.ToArray();
+			for (int i = 0; i < x.Length; ++i)
+			{
+				yield return operation(x[i]);
 			}
 		}
 	}

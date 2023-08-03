@@ -9,21 +9,59 @@ namespace FamilyTree
 	{
 		public static void PlotText(SvgDocument document, PointF centre, Person model, int numberOfGenerations)
 		{
-			var radii = MathHelper.GetCreateRadii(numberOfGenerations).ToArray();
+			var radii = MathHelper.GetCreateRadii(numberOfGenerations).Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
 
 			// Main Person
 			plotMainPerson(document, centre, model);
 
 			// Generation 1
-			var angleSets_1 = MathHelper.Intersect(MathHelper.GetCreateAngles(2)).ToArray();
+			var angleSets_1 = MathHelper.GetCreateAngles(2).Intersect().ToArray();
 			var personSet_1 = MathHelper.GetPersonsOfLevel(model, 2).ToArray();
-			plotInnerPersons(document, centre, (radii[1] + radii[0]) / 2.0f, angleSets_1, personSet_1);
+			plotInnerPersons(document, centre, radii[0], angleSets_1, personSet_1);
 
 			// Generation 2
-			var angleSets_2 = MathHelper.Intersect(MathHelper.GetCreateAngles(3)).ToArray();
+			var angleSets_2 = MathHelper.GetCreateAngles(3).Intersect().ToArray();
 			var personSet_2 = MathHelper.GetPersonsOfLevel(model, 3).ToArray();
-			plotInnerPersons(document, centre, (radii[2] + radii[1]) / 2.0f, angleSets_2, personSet_2);
+			plotInnerPersons(document, centre, radii[1], angleSets_2, personSet_2);
 
+			// Generation 3
+			var angleSet_3 = MathHelper.GetCreateAngles(4).Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
+			var personSet_3 = MathHelper.GetPersonsOfLevel(model, 4).ToArray();
+			plotOuterPersons(document, centre, radii[2], angleSet_3, personSet_3);
+		}
+
+		private static void plotOuterPersons(SvgDocument document, PointF centre, float radius, float[] angleSets, Person[] personSet)
+		{
+			for (int i = 0; i < angleSets.Length; ++i)
+				plotOuterPerson(document, centre, radius, angleSets[i], personSet[i]);
+
+		}
+
+		private static void plotOuterPerson(SvgDocument document, PointF centre, float radius, float angle, Person person)
+		{
+			// x / ( 2 * pi * r) = deltaAngle / 360
+			var deltaAngle = Constants.MainFontSize / (2.0f * MathF.PI * radius) * 360.0f;
+			document.Children.Add(RotatedLineCreator.CreateRotatedText(
+															centre,
+															radius,
+															angle - deltaAngle,
+															person.Name,
+															Color.Red,
+															Constants.MainFontSize));
+			document.Children.Add(RotatedLineCreator.CreateRotatedText(
+															centre, 
+															radius, 
+															angle, 
+															person.FamilyName, 
+															Color.Red, 
+															Constants.MainFontSize));
+			document.Children.Add(RotatedLineCreator.CreateRotatedText(
+															centre,
+															radius,
+															angle + deltaAngle,
+															createYearText(person),
+															Color.Red,
+															Constants.MainFontSize));
 		}
 
 		private static void plotInnerPersons(SvgDocument document, PointF centre, float radius, (float start, float end)[] angleSets, Person[] personSet)

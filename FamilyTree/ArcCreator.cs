@@ -37,7 +37,8 @@ namespace FamilyTree
 			var textPath = new SvgTextPath()
 			{
 				Text = text,
-				ReferencedPath = uri
+				ReferencedPath = uri,
+				Font = Constants.Font
 
 			};
 			path.ID = guid;

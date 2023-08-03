@@ -5,7 +5,7 @@ namespace FamilyTree
 {
 	class TextCreator
 	{
-		public static SvgElement CreateText(PointF centre, string text, Color color, float fontSize)
+		public static SvgElement CreateHorizontalText(PointF centre, string text, Color color, float fontSize)
 		{
 			var svgText = new SvgText()
 			{
@@ -15,7 +15,7 @@ namespace FamilyTree
 				Y = new SvgUnitCollection() { centre.Y },
 				Fill = new SvgColourServer(color),
 				Text = text,
-				Font = "Calibri"
+				Font = Constants.Font
 			};
 
 			return svgText;

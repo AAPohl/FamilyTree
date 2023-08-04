@@ -41,11 +41,28 @@ namespace FamilyTree
 				yield return person;
 			else
 			{
-				foreach (var p in GetPersonsOfLevel(person.Father, level - 1))
-					yield return p;
+				if (person.Father == null)
+				{
+					foreach (var p in GetPersonsOfLevel(Person.NoPerson, level - 1))
+						yield return p;
+				}
+				else
+				{
+					foreach (var p in GetPersonsOfLevel(person.Father, level - 1))
+						yield return p;
+				}
 
-				foreach (var p in GetPersonsOfLevel(person.Mother, level - 1))
-					yield return p;
+				if (person.Mother == null)
+				{
+					foreach (var p in GetPersonsOfLevel(Person.NoPerson, level - 1))
+						yield return p;
+				}
+				else
+				{
+
+					foreach (var p in GetPersonsOfLevel(person.Mother, level - 1))
+						yield return p;
+				}
 			}
 		}
 

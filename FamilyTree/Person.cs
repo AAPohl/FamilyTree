@@ -2,7 +2,8 @@
 {
 	public class Person
 	{
-		public Person(string name, string familyName, int birthYear, int? deathYear, bool isAlive, Person father, Person mother)
+		public static Person NoPerson { get; } = new Person("", "", null, null, false, null, null);
+		public Person(string name, string familyName, int? birthYear, int? deathYear, bool isAlive, Person father, Person mother)
 		{
 			Name = name;
 			FamilyName = familyName;
@@ -14,7 +15,7 @@
 		}
 		public string Name { get; }
 		public string FamilyName { get; }
-		public int BirthYear { get; }
+		public int? BirthYear { get; }
 		public int? DeathYear { get; }
 		public bool IsAlive { get; }
 		public Person Father { get; }

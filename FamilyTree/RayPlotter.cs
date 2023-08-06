@@ -1,4 +1,5 @@
-﻿using Svg;
+﻿using FamilyTree.Configuration;
+using Svg;
 using System.Drawing;
 using System.Linq;
 
@@ -6,10 +7,10 @@ namespace FamilyTree
 {
 	public static class RayPlotter
 	{
-		public static void PlotRays(SvgDocument document, PointF centre, int numberOfGenerations)
+		public static void PlotRays(SvgDocument document, PointF centre, IConfiguration configuration)
 		{
-			var radii = MathHelper.GetCreateRadii(numberOfGenerations).ToArray();
-			for (int j = 1; j < numberOfGenerations; ++j)
+			var radii = configuration.GetCreateRadii().ToArray();
+			for (int j = 1; j < configuration.GetNumberOfGenerations(); ++j)
 			{ 
 				var angles = MathHelper.GetCreateAngles(j+1).ToArray();
 				for (int i = 0; i < angles.Length; ++i)

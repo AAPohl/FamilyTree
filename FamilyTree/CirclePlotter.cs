@@ -1,4 +1,5 @@
-﻿using Svg;
+﻿using FamilyTree.Configuration;
+using Svg;
 using System.Drawing;
 using System.Linq;
 
@@ -6,9 +7,9 @@ namespace FamilyTree
 {
 	public static class CirclePlotter
 	{
-		public static void PlotCircles(SvgDocument document, PointF centre, int numberOfGenerations, float lineWidth)
+		public static void PlotCircles(SvgDocument document, PointF centre, float lineWidth, IConfiguration configuration)
 		{
-			var radii = MathHelper.GetCreateRadii(numberOfGenerations).ToArray();
+			var radii = configuration.GetCreateRadii().ToArray();
 			document.Children.Add(ArcCreator.CreateCircle(centre, radii[0], Color.FromArgb(255, 219, 219, 217), lineWidth));
 			foreach (var radius in radii.Skip(1))
 			{

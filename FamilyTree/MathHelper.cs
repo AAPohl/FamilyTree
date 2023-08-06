@@ -16,27 +16,6 @@ namespace FamilyTree
 			};
 		}
 
-		public static IEnumerable<float> GetCreateRadii(int numberOfGenerations)
-		{
-			var radius = 1.0f * Constants.ScalingFactor;
-			yield return radius;
-
-			for (int i = 1; i < numberOfGenerations; ++i)
-			{
-				if(i < 3)
-					radius = radius + 1.0f * Constants.ScalingFactor;
-				else if (i < 7)
-					radius = radius + 2.0f * Constants.ScalingFactor;
-				else if (i < 9)
-					radius = radius + 3.0f * Constants.ScalingFactor;
-				else if (i == 9)
-					radius = radius + 1.5f * Constants.ScalingFactor;
-				else
-					radius = radius + 0.75f * Constants.ScalingFactor;
-				yield return radius;
-			}
-		}
-
 		internal static IEnumerable<Person> GetPersonsOfLevel(Person person, int level)
 		{
 			if (level == 1)

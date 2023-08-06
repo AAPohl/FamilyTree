@@ -1,4 +1,5 @@
-﻿using Svg;
+﻿using FamilyTree.Configuration;
+using Svg;
 using System;
 using System.Drawing;
 using System.Linq;
@@ -7,9 +8,9 @@ namespace FamilyTree
 {
 	public static class TextPlotter
 	{
-		public static void PlotText(SvgDocument document, PointF centre, Person model, int numberOfGenerations)
+		public static void PlotText(SvgDocument document, PointF centre, Person model, IConfiguration configuration)
 		{
-			var radii = MathHelper.GetCreateRadii(numberOfGenerations).Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
+			var radii = configuration.GetCreateRadii().Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
 
 			// Main Person
 			plotMainPerson(document, centre, model, 12);
@@ -25,7 +26,7 @@ namespace FamilyTree
 			plotInnerPersons(document, centre, radii[1], angleSets_2, personSet_2, 12);
 
 			// Generation 3 .. n
-			for (int i = 3; i < numberOfGenerations; ++i)
+			for (int i = 3; i < configuration.GetNumberOfGenerations(); ++i)
 			{
 				var angleSet_N = MathHelper.GetCreateAngles(i+1).Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
 				var personSet_N = MathHelper.GetPersonsOfLevel(model, i+1).ToArray();

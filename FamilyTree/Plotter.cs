@@ -1,4 +1,5 @@
-﻿using Svg;
+﻿using FamilyTree.Configuration;
+using Svg;
 using System.Drawing;
 using System.Linq;
 
@@ -6,9 +7,9 @@ namespace FamilyTree
 {
 	public static class Plotter
 	{
-		public static SvgDocument Plot(Person model, int numberOfGenerations)
+		public static SvgDocument Plot(Person model, IConfiguration configuration)
 		{
-			var outerRadius = MathHelper.GetCreateRadii(numberOfGenerations).Last() + 20;
+			var outerRadius = configuration.GetCreateRadii().Last() + 20;
 			var size = new SizeF(2 * outerRadius, 2 * outerRadius);
 			var document = new SvgDocument();
 			document.Width = size.Width;
@@ -17,9 +18,9 @@ namespace FamilyTree
 
 			var centre = new PointF(outerRadius, outerRadius);
 
-			RayPlotter.PlotRays(document, centre, numberOfGenerations);
-			CirclePlotter.PlotCircles(document, centre, numberOfGenerations, 3.0f);
-			TextPlotter.PlotText(document, centre, model, numberOfGenerations);
+			RayPlotter.PlotRays(document, centre, configuration);
+			CirclePlotter.PlotCircles(document, centre, 3.0f, configuration);
+			TextPlotter.PlotText(document, centre, model, configuration);
 
 			return document;
 		}

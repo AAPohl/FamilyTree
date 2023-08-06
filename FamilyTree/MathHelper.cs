@@ -25,8 +25,10 @@ namespace FamilyTree
 			{
 				if(i < 3)
 					radius = radius + 1.0f * Constants.ScalingFactor;
-				else if (i < 9)
+				else if (i < 7)
 					radius = radius + 2.0f * Constants.ScalingFactor;
+				else if (i < 9)
+					radius = radius + 3.0f * Constants.ScalingFactor;
 				else if (i == 9)
 					radius = radius + 1.5f * Constants.ScalingFactor;
 				else

@@ -53,6 +53,8 @@ namespace FamilyTree
 
 		private static void plotOuterPerson(SvgDocument document, PointF centre, float radius, float angle, Person person, int currentGeneration, float fontSize)
 		{
+			if (person == Person.NoPerson)
+				return;
 			// x / ( 2 * pi * r) = deltaAngle / 360
 			var deltaAngle = fontSize / (2.0f * MathF.PI * radius) * 360.0f;
 			if (angle < 0)
@@ -101,7 +103,8 @@ namespace FamilyTree
 			}
 			else
 			{
-				var name = $"{person.Name.Remove(1,person.Name.Length - 1)}.{person.FamilyName}";
+				//var name = $"{person.Name.Remove(1,person.Name.Length - 1)}.{person.FamilyName}";
+				var name = $"{person.Name} {person.FamilyName}";
 				document.Children.Add(RotatedLineCreator.CreateRotatedText(
 																centre,
 																radius,
@@ -121,6 +124,8 @@ namespace FamilyTree
 
 		private static void plotInnerPerson(SvgDocument document, PointF centre, float radius, (float innerAngle, float outerAngle) angle, Person person, float fontSize)
 		{
+			if (person == Person.NoPerson)
+				return;
 			document.Children.Add(ArcCreator.CreateArcText(	centre, 
 															radius + fontSize,
 															angle.innerAngle,
@@ -146,6 +151,8 @@ namespace FamilyTree
 
 		private static void plotMainPerson(SvgDocument document, PointF centre, Person person, float fontSize)
 		{
+			if (person == Person.NoPerson)
+				return;
 			document.Children.Add(TextCreator.CreateHorizontalText(new PointF(centre.X, centre.Y - fontSize), 
 																	person.Name, 
 																	Color.Black,

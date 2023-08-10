@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace FamilyTree.Configuration
 {
@@ -29,5 +30,31 @@ namespace FamilyTree.Configuration
 
 		public int GetNumberOfGenerations() => numberOfGenerations;
 
+		public IEnumerable<TextInfo> GetTextInfo(Person person, int currentGeneration)
+		{
+			if (currentGeneration < 6)
+			{
+				yield return new TextInfo(person.Name, Color.Black, 12);
+				yield return new TextInfo(person.FamilyName, Color.Black, 12);
+				yield return new TextInfo(createYearText(person), Color.FromArgb(255, 139, 139, 142), 12);
+			}
+			else if (currentGeneration < 7)
+			{
+				yield return new TextInfo(person.Name, Color.Black, 12);
+				yield return new TextInfo(person.FamilyName, Color.Black, 12);
+			}
+			else
+			{
+				yield return new TextInfo($"{person.Name} {person.FamilyName}", Color.Black, 12);
+			}
+		}
+
+		private static string createYearText(Person person)
+		{
+			if (person.IsAlive)
+				return $"{person.BirthYear} - Lebend";
+			else
+				return $"{person.BirthYear} - {person.DeathYear}";
+		}
 	}
 }

@@ -12,25 +12,25 @@ namespace FamilyTree
 		{
 			var radii = configuration.GetCreateRadii().Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
 
-			// Main Person
-			plotMainPerson(document, centre, model, 12);
+			// Main Person (Generation 1)
+			plotMainPerson(document, centre, model, configuration);
 
-			// Generation 1
-			var angleSets_1 = MathHelper.GetCreateAngles(2).Intersect().ToArray();
-			var personSet_1 = MathHelper.GetPersonsOfLevel(model, 2).ToArray();
-			plotInnerPersons(document, centre, radii[0], angleSets_1, personSet_1, 12);
+			// Generation 2 .. 3
+			for (int i = 2; i < 4; ++i)
+			{
+				var angleSets_N = MathHelper.GetCreateAngles(i).Intersect().ToArray();
+				var personSet_N = MathHelper.GetPersonsOfLevel(model, i).ToArray();
+				for (int j = 0; j < angleSets_N.Length; ++j)
+					plotInnerPerson(document, centre, radii[i-2], angleSets_N[j], personSet_N[j], i, configuration);
+			}
 
-			// Generation 2
-			var angleSets_2 = MathHelper.GetCreateAngles(3).Intersect().ToArray();
-			var personSet_2 = MathHelper.GetPersonsOfLevel(model, 3).ToArray();
-			plotInnerPersons(document, centre, radii[1], angleSets_2, personSet_2, 12);
-
-			// Generation 3 .. n
+			// Generation 4 .. n
 			for (int i = 3; i < configuration.GetNumberOfGenerations(); ++i)
 			{
 				var angleSet_N = MathHelper.GetCreateAngles(i+1).Intersect().Compute(i => (i.start + i.end) / 2.0f).ToArray();
 				var personSet_N = MathHelper.GetPersonsOfLevel(model, i+1).ToArray();
-				plotOuterPersons(document, centre, radii[i-1], angleSet_N, personSet_N, i, getFontForLevel(i));
+				for (int j = 0; j < angleSet_N.Length; ++j)
+					plotOuterPerson(document, centre, radii[i - 1], angleSet_N[j], personSet_N[j], i, configuration);
 			}
 		}
 
@@ -45,127 +45,97 @@ namespace FamilyTree
 			return 3.0f;
 		}
 
-		private static void plotOuterPersons(SvgDocument document, PointF centre, float radius, float[] angleSets, Person[] personSet, int currentGeneration, float fontSize)
-		{
-			for (int i = 0; i < angleSets.Length; ++i)
-				plotOuterPerson(document, centre, radius, angleSets[i], personSet[i], currentGeneration, fontSize);
-
-		}
-
-		private static void plotOuterPerson(SvgDocument document, PointF centre, float radius, float angle, Person person, int currentGeneration, float fontSize)
+		private static void plotOuterPerson(SvgDocument document, PointF centre, float radius, float angle, Person person, int currentGeneration, IConfiguration configuration)
 		{
 			if (person == Person.NoPerson)
 				return;
-			// x / ( 2 * pi * r) = deltaAngle / 360
-			var deltaAngle = fontSize / (2.0f * MathF.PI * radius) * 360.0f;
-			if (angle < 0)
-				deltaAngle = -deltaAngle;
 
-			if (currentGeneration < 6)
-			{
-				document.Children.Add(RotatedLineCreator.CreateRotatedText(
-																centre,
-																radius,
-																angle - deltaAngle,
-																person.Name,
-																Color.Black,
-																fontSize));
-				document.Children.Add(RotatedLineCreator.CreateRotatedText(
-																centre,
-																radius,
-																angle,
-																person.FamilyName,
-																Color.Black,
-																fontSize));
-				document.Children.Add(RotatedLineCreator.CreateRotatedText(
-																centre,
-																radius,
-																angle + deltaAngle,
-																createYearText(person),
-																Color.FromArgb(255, 139, 139, 142),
-																fontSize));
-			}
-			else if (currentGeneration < 7)
-			{
-				document.Children.Add(RotatedLineCreator.CreateRotatedText(
-																centre,
-																radius,
-																angle - deltaAngle /2.0f,
-																person.Name,
-																Color.Black,
-																fontSize));
-				document.Children.Add(RotatedLineCreator.CreateRotatedText(
-																centre,
-																radius,
-																angle + deltaAngle / 2.0f,
-																person.FamilyName,
-																Color.Black,
-																fontSize));
-			}
-			else
-			{
-				//var name = $"{person.Name.Remove(1,person.Name.Length - 1)}.{person.FamilyName}";
-				var name = $"{person.Name} {person.FamilyName}";
-				document.Children.Add(RotatedLineCreator.CreateRotatedText(
-																centre,
-																radius,
-																angle,
-																name,
-																Color.Black,
-																fontSize));
-			}
-		}
+			var angles = Array.Empty<float>();
+			var textInfos = configuration.GetTextInfo(person, currentGeneration).ToArray();
 
-		private static void plotInnerPersons(SvgDocument document, PointF centre, float radius, (float start, float end)[] angleSets, Person[] personSet, float fontSize)
-		{
-			for(int i = 0; i <angleSets.Length; ++i)			
-				plotInnerPerson(document, centre, radius, angleSets[i], personSet[i], fontSize);
+			switch (textInfos.Length)
+			{
+				case 1:
+					angles = new[] { angle };
+					break;
+				case 2:
+					var deltaAngle = (textInfos[0].FontSize + textInfos[1].FontSize) / (4.0f * MathF.PI * radius) * 360.0f;
+					if (angle < 0)
+						deltaAngle = -deltaAngle;
+					angles = new[] { angle - deltaAngle / 2.0f, angle + deltaAngle / 2.0f };
+					break;
+				case 3:
+					var deltaAngle_1 = (textInfos[0].FontSize + textInfos[1].FontSize) / (4.0f * MathF.PI * radius) * 360.0f;
+					var deltaAngle_2 = (textInfos[1].FontSize + textInfos[2].FontSize) / (4.0f * MathF.PI * radius) * 360.0f;
+					if (angle < 0)
+					{
+						deltaAngle_1 = -deltaAngle_1;
+						deltaAngle_2 = -deltaAngle_2;
+					}
+					angles = new[] { angle - deltaAngle_1, angle, angle + deltaAngle_2};
+					break;
+				default:
+					throw new NotImplementedException();
+			}
+
+			foreach (var textLine in angles.Select((a, i) => (angle: a, textInfo: textInfos[i])))
+			{
+				document.Children.Add(RotatedLineCreator.CreateRotatedText(
+														centre,
+														radius,
+														textLine.angle,
+														textLine.textInfo.Text,
+														textLine.textInfo.Color,
+														textLine.textInfo.FontSize));
+			}
 			
 		}
 
-		private static void plotInnerPerson(SvgDocument document, PointF centre, float radius, (float innerAngle, float outerAngle) angle, Person person, float fontSize)
+		private static void plotInnerPerson(SvgDocument document, PointF centre, float radius, (float innerAngle, float outerAngle) angle, Person person, int currentGeneration, IConfiguration configuration)
 		{
 			if (person == Person.NoPerson)
 				return;
-			document.Children.Add(ArcCreator.CreateArcText(	centre, 
-															radius + fontSize,
+
+			var textInfos = configuration.GetTextInfo(person, currentGeneration).ToArray();
+			if (textInfos.Length != 3)
+				throw new NotImplementedException();
+
+			var radii = new[] { radius + textInfos[0].FontSize / 2.0f + textInfos[1].FontSize / 2.0f,
+								radius,
+								radius - textInfos[1].FontSize / 2.0f - textInfos[2].FontSize / 2.0f};
+
+			foreach (var textLine in radii.Select((r, i) => (radius: r, textInfo: textInfos[i])))
+			{
+				document.Children.Add(ArcCreator.CreateArcText(centre,
+															textLine.radius,
 															angle.innerAngle,
-															angle.outerAngle, 
-															person.Name, 
-															Color.Black, 
-															fontSize));
-			document.Children.Add(ArcCreator.CreateArcText(	centre, 
-															radius,
-															angle.innerAngle,
-															angle.outerAngle, 
-															person.FamilyName, 
-															Color.Black,
-															fontSize));
-			document.Children.Add(ArcCreator.CreateArcText(	centre, 
-															radius - fontSize,
-															angle.innerAngle,
-															angle.outerAngle, 
-															createYearText(person), 
-															Color.FromArgb(255, 139, 139, 142),
-															fontSize));
+															angle.outerAngle,
+															textLine.textInfo.Text,
+															textLine.textInfo.Color,
+															textLine.textInfo.FontSize));
+			}
 		}
 
-		private static void plotMainPerson(SvgDocument document, PointF centre, Person person, float fontSize)
+		private static void plotMainPerson(SvgDocument document, PointF centre, Person person, IConfiguration configuration)
 		{
 			if (person == Person.NoPerson)
 				return;
-			document.Children.Add(TextCreator.CreateHorizontalText(new PointF(centre.X, centre.Y - fontSize), 
-																	person.Name, 
-																	Color.Black,
-																	fontSize));
-			document.Children.Add(TextCreator.CreateHorizontalText(	centre, 
-																	person.FamilyName,	
-																	Color.Black,
-																	fontSize));
-			document.Children.Add(TextCreator.CreateHorizontalText(	new PointF(centre.X, centre.Y + fontSize), 
-																	createYearText(person), 
-																	Color.FromArgb(255, 139, 139, 142),
-																	fontSize));
+
+			var textInfos = configuration.GetTextInfo(person, 1).ToArray();
+			if (textInfos.Length != 3)
+				throw new NotImplementedException();
+
+			var points = new[] { PointF.Subtract(centre, new SizeF(0, textInfos[0].FontSize / 2.0f + textInfos[1].FontSize / 2.0f)),
+								 centre,
+								 PointF.Add(centre, new SizeF(0, textInfos[1].FontSize / 2.0f + textInfos[2].FontSize / 2.0f))};
+
+			foreach(var textLine in points.Select((p, i) => (point: p, textInfo: textInfos[i])))
+			{
+				document.Children.Add(TextCreator.CreateHorizontalText(textLine.point,
+																	textLine.textInfo.Text,
+																	textLine.textInfo.Color,
+																	textLine.textInfo.FontSize));
+			}
 		}
 
 		private static string createYearText(Person person)

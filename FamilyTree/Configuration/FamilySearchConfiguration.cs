@@ -52,9 +52,17 @@ namespace FamilyTree.Configuration
 		private static string createYearText(Person person)
 		{
 			if (person.IsAlive)
-				return $"{person.BirthYear} - Lebend";
+			{
+				return person.BirthYear != null ? $"{person.BirthYear} - Lebend" : "Lebend";
+			}
 			else
-				return $"{person.BirthYear} - {person.DeathYear}";
+			{
+				if (person.DeathYear == null)
+					return person.BirthYear != null ? $"{person.BirthYear} - Verstorben" : "Verstorben";
+				else
+					return person.BirthYear != null ? $"{person.BirthYear} - {person.DeathYear}" : $"Unbekannt - {person.DeathYear}";
+
+			}
 		}
 	}
 }
